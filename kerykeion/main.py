@@ -34,6 +34,7 @@ class KrInstance():
 
     """
     now = datetime.datetime.now()
+    swe.set_ephe_path("C:\\GitHub\\kerykeion\\SWEPH\\EPHE");
 
     def __init__(
         self,
@@ -158,6 +159,8 @@ class KrInstance():
             return 10  # change!
         elif name == "true_node":
             return 11
+        elif name == "chiron":    
+            return 12
         else:
             return int(name)
 
@@ -167,22 +170,22 @@ class KrInstance():
         the houses or the planets list."""
         if degree < 30:
             dictionary = {label: number_name, "quality": "Cardinal", "element":
-                          "Fire", "sign": "Ari", "sign_num": 0, "position": degree, "abs_pos": degree,
+                          "Fire", "sign": "Aries", "sign_num": 0, "position": degree, "abs_pos": degree,
                           "emoji": "♈️"}
         elif degree < 60:
             result = degree - 30
             dictionary = {label: number_name, "quality": "Fixed", "element":
-                          "Earth", "sign": "Tau", "sign_num": 1, "position": result, "abs_pos": degree,
+                          "Earth", "sign": "Taurus", "sign_num": 1, "position": result, "abs_pos": degree,
                           "emoji": "♉️"}
         elif degree < 90:
             result = degree - 60
             dictionary = {label: number_name, "quality": "Mutable", "element":
-                          "Air", "sign": "Gem", "sign_num": 2, "position": result, "abs_pos": degree,
+                          "Air", "sign": "Gemini", "sign_num": 2, "position": result, "abs_pos": degree,
                           "emoji": "♊️"}
         elif degree < 120:
             result = degree - 90
             dictionary = {label: number_name, "quality": "Cardinal", "element":
-                          "Water", "sign": "Can", "sign_num": 3, "position": result, "abs_pos": degree,
+                          "Water", "sign": "Cancer", "sign_num": 3, "position": result, "abs_pos": degree,
                           "emoji": "♋️"}
         elif degree < 150:
             result = degree - 120
@@ -192,37 +195,37 @@ class KrInstance():
         elif degree < 180:
             result = degree - 150
             dictionary = {label: number_name, "quality": "Mutable", "element":
-                          "Earth", "sign": "Vir", "sign_num": 5, "position": result, "abs_pos": degree,
+                          "Earth", "sign": "Virgo", "sign_num": 5, "position": result, "abs_pos": degree,
                           "emoji": "♍️"}
         elif degree < 210:
             result = degree - 180
             dictionary = {label: number_name, "quality": "Cardinal", "element":
-                          "Air", "sign": "Lib", "sign_num": 6, "position": result, "abs_pos": degree,
+                          "Air", "sign": "Libra", "sign_num": 6, "position": result, "abs_pos": degree,
                           "emoji": "♎️"}
         elif degree < 240:
             result = degree - 210
             dictionary = {label: number_name, "quality": "Fixed", "element":
-                          "Water", "sign": "Sco", "sign_num": 7, "position": result, "abs_pos": degree,
+                          "Water", "sign": "Scorpio", "sign_num": 7, "position": result, "abs_pos": degree,
                           "emoji": "♏️"}
         elif degree < 270:
             result = degree - 240
             dictionary = {label: number_name, "quality": "Mutable", "element":
-                          "Fire", "sign": "Sag", "sign_num": 8, "position": result, "abs_pos": degree,
+                          "Fire", "sign": "Sagittarius", "sign_num": 8, "position": result, "abs_pos": degree,
                           "emoji": "♐️"}
         elif degree < 300:
             result = degree - 270
             dictionary = {label: number_name, "quality": "Cardinal", "element":
-                          "Earth", "sign": "Cap", "sign_num": 9, "position": result, "abs_pos": degree,
+                          "Earth", "sign": "Capricorn", "sign_num": 9, "position": result, "abs_pos": degree,
                           "emoji": "♑️"}
         elif degree < 330:
             result = degree - 300
             dictionary = {label: number_name, "quality": "Fixed", "element":
-                          "Air", "sign": "Aqu", "sign_num": 10, "position": result, "abs_pos": degree,
+                          "Air", "sign": "Aquarius", "sign_num": 10, "position": result, "abs_pos": degree,
                           "emoji": "♒️"}
         elif degree < 360:
             result = degree - 330
             dictionary = {label: number_name, "quality": "Mutable", "element":
-                          "Water", "sign": "Pis", "sign_num": 11, "position": result, "abs_pos": degree,
+                          "Water", "sign": "Pisces", "sign_num": 11, "position": result, "abs_pos": degree,
                           "emoji": "♓️"}
         else:
             dictionary = {label: "position_calc error", "sign": "position_calc error",
@@ -234,8 +237,10 @@ class KrInstance():
         """Calculatetype positions and store them in dictionaries"""
 
         # creates the list of the house in 360°
-        self.houses_degree_ut = swe.houses(self.julian_day, self.city_lat,
-                                           self.city_long)[0]
+        # House Method: Placidus
+        # Not work: int(''.join([str(ord(c)) for c in 'P']))
+        # swe.house_name(b'P') 
+        self.houses_degree_ut = swe.houses(self.julian_day, self.city_lat, self.city_long, b'P')[0]
         # stores the house in signulare dictionaries.
         self.first_house = self.position_calc(
             self.houses_degree_ut[0], "1", "name")
@@ -296,13 +301,14 @@ class KrInstance():
         pluto_deg = swe.calc(self.julian_day, 9, self.iflag)[0][0]
         mean_node_deg = swe.calc(self.julian_day, 10, self.iflag)[0][0]
         true_node_deg = swe.calc(self.julian_day, 11, self.iflag)[0][0]
-
+        chiron_deg = swe.calc(self.julian_day, 15, self.iflag)[0][0]
+        
         # print(swe.calc(self.julian_day, 7, self.iflag)[3])
 
         self.planets_degrees = [sun_deg, moon_deg, mercury_deg,
                                 venus_deg, mars_deg, jupiter_deg, saturn_deg,
                                 uranus_deg, neptune_deg, pluto_deg, mean_node_deg,
-                                true_node_deg]
+                                true_node_deg, chiron_deg]
 
         return self.planets_degrees
 
@@ -313,25 +319,17 @@ class KrInstance():
         # stores the planets in signulare dictionaries.
         self.sun = self.position_calc(self.planets_degrees[0], "Sun", "name")
         self.moon = self.position_calc(self.planets_degrees[1], "Moon", "name")
-        self.mercury = self.position_calc(
-            self.planets_degrees[2], "Mercury", "name")
-        self.venus = self.position_calc(
-            self.planets_degrees[3], "Venus", "name")
+        self.mercury = self.position_calc(self.planets_degrees[2], "Mercury", "name")
+        self.venus = self.position_calc(self.planets_degrees[3], "Venus", "name")
         self.mars = self.position_calc(self.planets_degrees[4], "Mars", "name")
-        self.jupiter = self.position_calc(
-            self.planets_degrees[5], "Jupiter", "name")
-        self.saturn = self.position_calc(
-            self.planets_degrees[6], "Saturn", "name")
-        self.uranus = self.position_calc(
-            self.planets_degrees[7], "Uranus", "name")
-        self.neptune = self.position_calc(
-            self.planets_degrees[8], "Neptune", "name")
-        self.pluto = self.position_calc(
-            self.planets_degrees[9], "Pluto", "name")
-        self.mean_node = self.position_calc(
-            self.planets_degrees[10], "Mean_Node", "name")
-        self.true_node = self.position_calc(
-            self.planets_degrees[11], "True_Node", "name")
+        self.jupiter = self.position_calc(self.planets_degrees[5], "Jupiter", "name")
+        self.saturn = self.position_calc(self.planets_degrees[6], "Saturn", "name")
+        self.uranus = self.position_calc(self.planets_degrees[7], "Uranus", "name")
+        self.neptune = self.position_calc(self.planets_degrees[8], "Neptune", "name")
+        self.pluto = self.position_calc(self.planets_degrees[9], "Pluto", "name")
+        self.mean_node = self.position_calc(self.planets_degrees[10], "Mean_Node", "name")
+        self.true_node = self.position_calc(self.planets_degrees[11], "True_Node", "name")
+        self.chiron = self.position_calc(self.planets_degrees[12], "Chiron", "name")
 
     def planets_in_houses(self):
         """Calculates the house of the planet and updates
@@ -396,29 +394,21 @@ class KrInstance():
 
         self.sun = for_every_planet(self.sun, self.planets_degrees[0])
         self.moon = for_every_planet(self.moon, self.planets_degrees[1])
-        self.mercury = for_every_planet(
-            self.mercury, self.planets_degrees[2])
-        self.venus = for_every_planet(
-            self.venus, self.planets_degrees[3])
+        self.mercury = for_every_planet(self.mercury, self.planets_degrees[2])
+        self.venus = for_every_planet(self.venus, self.planets_degrees[3])
         self.mars = for_every_planet(self.mars, self.planets_degrees[4])
-        self.jupiter = for_every_planet(
-            self.jupiter, self.planets_degrees[5])
-        self.saturn = for_every_planet(
-            self.saturn, self.planets_degrees[6])
-        self.uranus = for_every_planet(
-            self.uranus, self.planets_degrees[7])
-        self.neptune = for_every_planet(
-            self.neptune, self.planets_degrees[8])
-        self.pluto = for_every_planet(
-            self.pluto, self.planets_degrees[9])
-        self.mean_node = for_every_planet(
-            self.mean_node, self.planets_degrees[10])
-        self.true_node = for_every_planet(
-            self.true_node, self.planets_degrees[11])
+        self.jupiter = for_every_planet(self.jupiter, self.planets_degrees[5])
+        self.saturn = for_every_planet(self.saturn, self.planets_degrees[6])
+        self.uranus = for_every_planet(self.uranus, self.planets_degrees[7])
+        self.neptune = for_every_planet(self.neptune, self.planets_degrees[8])
+        self.pluto = for_every_planet(self.pluto, self.planets_degrees[9])
+        self.mean_node = for_every_planet(self.mean_node, self.planets_degrees[10])
+        self.true_node = for_every_planet(self.true_node, self.planets_degrees[11])
+        self.chiron = for_every_planet(self.chiron, self.planets_degrees[12])
 
         planets_list = [self.sun, self.moon, self.mercury, self.venus,
                         self.mars, self.jupiter, self.saturn, self.uranus, self.neptune,
-                        self.pluto, self.mean_node, self.true_node]
+                        self.pluto, self.mean_node, self.true_node, self.chiron]
 
         # Check in retrograde or not:
 
@@ -496,7 +486,7 @@ class KrInstance():
         """ Internal function to generate the lists"""
         self.planets_list = [self.sun, self.moon, self.mercury, self.venus,
                              self.mars, self.jupiter, self.saturn, self.uranus, self.neptune,
-                             self.pluto, self.mean_node, self.true_node]
+                             self.pluto, self.mean_node, self.true_node, self.chiron]
 
         self.houses_list = [self.first_house, self.second_house, self.third_house,
                             self.fourth_house, self.fifth_house, self.sixth_house, self.seventh_house,
